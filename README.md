@@ -1,1 +1,1 @@
-Code and description for 'Transcription Factors Binding Prediction', an InClass predicition competition on Kaggle
+Code and description for 'Transcription Factors Binding Prediction', an InClass Predicition Competition on Kaggle
