@@ -49,12 +49,13 @@ print("Creating LSTM Model . . .")
 gcn = 1.25 #Gradient Clipping Norm
 lstm_units = 20
 epochs = 25
-batch_size = 50
+batch_size = 10
 
 optimizer = Adadelta(clipnorm = gcn)
 model = Sequential()
 #model.add(LSTM(lstm_units, dropout = 0.2, recurrent_dropout = 0.2))
 model.add(LSTM(lstm_units, input_shape=(14, 1)))
+#model.add(LSTM(lstm_units))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
