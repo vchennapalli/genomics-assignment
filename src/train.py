@@ -66,7 +66,7 @@ print("Creating LSTM Model . . .")
 
 gcn = 1.25 #Gradient Clipping Norm
 lstm_units = 20
-epochs = 1
+epochs = 25
 batch_size = 50
 
 optimizer = Adadelta(clipnorm = gcn)
