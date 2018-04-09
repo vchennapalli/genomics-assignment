@@ -31,26 +31,8 @@ def get_train_data(filepath):
         sequences[i] = newseq
     return sequences[1:], labels[1:]
 
-def get_test_data(filepath):
-    """
-    input: filepath - string path to test data
-    output: test_tfbs - List of 14 character tfbs sequences 
-    """
-    colnames = ['sequence']
-    data = pd.read_csv(filepath, names = colnames)
-    sequences = data.sequence.tolist()
-    for i in range(1, 401):
-        seq = sequences[i]
-        newseq = []
-        for l in seq:
-            newseq.append(mapping[l])
-        sequences[i] = newseq
-    return sequences[1:]
-
-
 mapping = {'A': 1, 'C': 2, 'G': 3, 'T': 4}
 train_tfbs, train_labels = get_train_data(TRAIN_PATH)
-test_tfbs = get_test_data(TEST_PATH)
 test_classes = []
 
 #dividing the given set into training and validation sets in 4:1 ratio
