@@ -1,10 +1,13 @@
 #Author: Vineeth Chennapalli
 #Big Data Genomics Assignment
+
 import pandas as pd
 import numpy as np
 from keras.layers import Dense, Dropout, LSTM
 from keras.models import Sequential 
 from keras.optimizers import Adadelta
+import matplotlib.pyplot as plt
+
 DATA_FOLDER = '../data'
 TRAIN_PATH = DATA_FOLDER + '/train.csv'
 TEST_PATH = DATA_FOLDER + '/test.csv'
@@ -63,7 +66,7 @@ print("Creating LSTM Model . . .")
 
 gcn = 1.25 #Gradient Clipping Norm
 lstm_units = 20
-epochs = 25
+epochs = 1
 batch_size = 50
 
 optimizer = Adadelta(clipnorm = gcn)
@@ -90,3 +93,19 @@ model_json = model.to_json()
 with open(SAVED_MODEL_PATH, 'w') as jf:
      jf.write(model_json)
 model.save_weights(SAVED_WEIGHTS_PATH)
+
+plt.plot(model_history.history['acc'])
+plt.plot(model_history.history['val_acc'])
+plt.title('Model Accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+plt.show()
+
+plt.plot(model_history.history['loss'])
+plt.plot(model_history.history['val_loss'])
+plt.title('Model Loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper right')
+plt.show() 
