@@ -3,10 +3,11 @@
 
 import pandas as pd
 import numpy as np
-from keras.layers import Dense, Dropout, LSTM
+from keras.layers import Dense, Dropout, LSTM, Embedding, Bidirectional
 from keras.models import Sequential 
 from keras.optimizers import Adadelta
 import matplotlib.pyplot as plt
+import random
 
 DATA_FOLDER = '../data'
 TRAIN_PATH = DATA_FOLDER + '/train.csv'
@@ -31,31 +32,33 @@ def get_train_data(filepath):
         sequences[i] = newseq
     return sequences[1:], labels[1:]
 
-mapping = {'A': 1, 'C': 2, 'G': 3, 'T': 4}
+mapping = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
 train_tfbs, train_labels = get_train_data(TRAIN_PATH)
-test_classes = []
 
-#dividing the given set into training and validation sets in 4:1 ratio
+data = list(zip(train_tfbs, train_labels))
+random.shuffle(data)
+train_tfbs, train_labels = zip(*data)
 
-tfbs_train, tfbs_validation = train_tfbs[:1600], train_tfbs[1600:]
-labels_train, labels_validation = train_labels[:1600], train_labels[1600:]
-#tfbs_train, tfbs_validation = np.array([list(word) for word in tfbs_train]), np.array([list(word) for word in tfbs_validation]) 
-tfbs_train, tfbs_validation = np.array(tfbs_train), np.array(tfbs_validation)
-labels_train, labels_validation = np.array(labels_train), np.array(labels_validation)
-tfbs_train, tfbs_validation = tfbs_train.reshape(1600, 14, 1), tfbs_validation.reshape(400, 14, 1)
-#labels_train, labels_validation = labels_train.reshape(1600, 1, 1), labels_validation.reshape(400, 2, 1)
+tfbs_train, labels_train = np.array(train_tfbs), np.array(train_labels)
+
 print("Creating LSTM Model . . .")
 
 gcn = 1.25 #Gradient Clipping Norm
-lstm_units = 20
-epochs = 25
-batch_size = 10
+lstm_units = 32
+batch_size = 20
+
+embedding_matrix = np.zeros((4, 4))
+embedding_matrix[0][0] = 1
+embedding_matrix[1][1] = 1
+embedding_matrix[2][2] = 1
+embedding_matrix[3][3] = 1
 
 optimizer = Adadelta(clipnorm = gcn)
 model = Sequential()
-#model.add(LSTM(lstm_units, dropout = 0.2, recurrent_dropout = 0.2))
-model.add(LSTM(lstm_units, input_shape=(14, 1)))
-#model.add(LSTM(lstm_units))
+
+model.add(Embedding(4, 4, weights = [embedding_matrix], input_length = 14, trainable = False))
+model.add(Bidirectional(LSTM(units = lstm_units, return_sequences = True)))
+model.add(Bidirectional(LSTM(units = lstm_units)))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
@@ -63,12 +66,8 @@ print(model.summary())
 print("Starting training . . .")
 
 #Training
-
-for epoch in range(epochs):
-    model_history = model.fit(tfbs_train, labels_train, batch_size = batch_size, epochs = 10, validation_data = (tfbs_validation, labels_validation))
-    print("Epoch: " + repr(epoch))
-
-scores = model.evaluate(tfbs_validation, labels_validation, verbose = 0, batch_size = 1)
+model_history = model.fit(tfbs_train, labels_train, batch_size = batch_size, epochs = 15, validation_split = 0.2)
+scores = model.evaluate(tfbs_train[1600:], labels_train[1600:], verbose = 0, batch_size = batch_size)
 print("Accuracy: %.2f%%" % (scores[1]*100))
 
 #saving the model
@@ -91,4 +90,4 @@ plt.title('Model Loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['Train', 'Validation'], loc='upper right')
-plt.show() 
+plt.show()

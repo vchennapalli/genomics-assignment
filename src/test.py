@@ -34,7 +34,6 @@ mapping = {'A': 1, 'C': 2, 'G': 3, 'T': 4}
 test_tfbs = get_test_data(TEST_PATH)
 
 tfbs_test = np.array(test_tfbs)
-tfbs_test = tfbs_test.reshape(400, 14, 1)
 
 with open(SAVED_MODEL_PATH, 'r') as jf:
     json = jf.read()
@@ -44,14 +43,14 @@ model.load_weights(SAVED_WEIGHTS_PATH)
 print("Loaded the saved model")
  
 predictions = model.predict(tfbs_test)
-print(predictions)
+#print(predictions)
 results = []
 for p in predictions:
     if p[0] > 0.5:
         results.append([1])
     else:
         results.append([0])
-print(results)
+#print(results)
 df = pd.DataFrame(data = results, columns = {"prediction"})
 df.to_csv(path_or_buf = RESULTS, columns={"prediction"}, header=True, index=True, index_label="id")
 
