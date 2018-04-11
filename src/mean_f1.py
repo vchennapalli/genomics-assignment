@@ -4,13 +4,13 @@ Big Data Genomics Assignment
 """
 import pandas as pd
 DATA_FOLDER = '../data'
-TRAIN_PATH = DATA_FOLDER + '/train_1.csv'
+TRAIN_PATH = DATA_FOLDER + '/train.csv'
 RESULTS = '../results/predictions.csv'
 
 colnames = ['sequence', 'label']
 data = pd.read_csv(TRAIN_PATH, names = colnames)
 labels = data.label.tolist()
-labels = labels[1921:]
+labels = labels[1600:]
 
 colnames = ['id', 'prediction']
 results = pd.read_csv(RESULTS, names = colnames)
@@ -22,7 +22,7 @@ print(predictions)
 tp, tn, fp, fn = 0, 0, 0, 0
 print(len(labels))
 print(len(predictions))
-for i in range(480):
+for i in range(400):
     if labels[i] == predictions[i]:
         if predictions[i] == 1:
             tp += 1
